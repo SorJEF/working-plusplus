@@ -75,6 +75,7 @@ describe( 'handlePlusMinus', () => {
 
   const item = 'SomeRandomThing',
         channel = 'C12345678',
+        value = 10,
         score = 5;
 
   /** @returns {integer} Returns a fake score. */
@@ -90,11 +91,11 @@ describe( 'handlePlusMinus', () => {
     slack.setSlackClient( slackClientMock );
     points.updateScore = jest.fn();
 
-    events.handlePlusMinus( item, '+', channel );
+    events.handlePlusMinus( item, '+', value, channel );
 
     expect( points.updateScore )
       .toHaveBeenCalledTimes( 1 )
-      .toHaveBeenCalledWith( item, '+' );
+      .toHaveBeenCalledWith( item, '+', value );
   });
 
   it.each([ [ 'plus', '+' ], [ 'minus', '-' ] ])(
@@ -111,7 +112,7 @@ describe( 'handlePlusMinus', () => {
       points.updateScore = jest.fn( updateScoreMock );
       messages.getRandomMessage = jest.fn();
 
-      return events.handlePlusMinus( item, operation, channel ).then( () => {
+      return events.handlePlusMinus( item, operation, value, channel ).then( () => {
         expect( messages.getRandomMessage )
           .toHaveBeenCalledTimes( 1 )
           .toHaveBeenCalledWith( operationName, item, score );
@@ -130,7 +131,7 @@ describe( 'handlePlusMinus', () => {
     points.updateScore = jest.fn();
     slack.sendMessage = jest.fn();
 
-    return events.handlePlusMinus( item, '+', channel ).then( () => {
+    return events.handlePlusMinus( item, '+', value, channel ).then( () => {
       expect( slack.sendMessage )
         .toHaveBeenCalledTimes( 1 )
         .toHaveBeenCalledWith( expect.stringContaining( item ), channel );
@@ -203,6 +204,7 @@ describe( 'handleEvent', () => {
 
   const validEvents = [
     [ 'message', '@Hello++' ],
+    [ 'message', '@Hello++10' ],
     [ 'app_mention', '<@U12345678> can haz leaderboard' ]
   ];
 

@@ -59,6 +59,7 @@ describe( 'extractCommand', () => {
 
 });
 
+// eslint-disable-next-line max-statements
 describe( 'extractPlusMinusEventData', () => {
 
   it( 'drops message without an @ symbol', () => {
@@ -76,28 +77,40 @@ describe( 'extractPlusMinusEventData', () => {
   it( 'extracts a \'thing\' and operation from the start of a message', () => {
     expect( helpers.extractPlusMinusEventData( '@SomethingRandom++ that was awesome' ) ).toEqual({
       item: 'SomethingRandom',
-      operation: '+'
+      operation: '+',
+      value: 1
     });
   });
 
   it( 'extracts a user and operation from the start of a message', () => {
     expect( helpers.extractPlusMinusEventData( '<@U87654321>++ that was awesome' ) ).toEqual({
       item: 'U87654321',
-      operation: '+'
+      operation: '+',
+      value: 1
     });
   });
 
   it( 'extracts data in the middle of a message', () => {
     expect( helpers.extractPlusMinusEventData( 'Hey @SomethingRandom++ you\'re great' ) ).toEqual({
       item: 'SomethingRandom',
-      operation: '+'
+      operation: '+',
+      value: 1
+    });
+  });
+
+  it( 'extracts data with value in the middle of a message', () => {
+    expect( helpers.extractPlusMinusEventData( 'Hey @SomethingRandom++10 you\'re great' ) ).toEqual({
+      item: 'SomethingRandom',
+      operation: '+',
+      value: 10
     });
   });
 
   it( 'extracts data at the end of a message', () => {
     expect( helpers.extractPlusMinusEventData( 'Awesome work @SomethingRandom++' ) ).toEqual({
       item: 'SomethingRandom',
-      operation: '+'
+      operation: '+',
+      value: 1
     });
   });
 
@@ -131,32 +144,53 @@ describe( 'extractPlusMinusEventData', () => {
     }
   ];
 
+  const valuesToMatch = [
+    {
+      supplied: '',
+      expected: 1
+    },
+    {
+      supplied: '10',
+      expected: 10
+    },
+    {
+      supplied: '1123131',
+      expected: 1123131
+    }
+  ];
+
   const operationsNotToMatch = [
     '+',
     '-'
   ];
 
+  /* eslint-disable max-depth */
   for ( const item of itemsToMatch ) {
 
     for ( const operation of operationsToMatch ) {
-      for ( let iterator = 0; 1 >= iterator; iterator++ ) {
+      for ( const value of valuesToMatch ) {
+        for ( let iterator = 0; 1 >= iterator; iterator++ ) {
 
-        const space = 1 === iterator ? ' ' : '',
-              messageText = item.supplied + space + operation.supplied,
-              testName = (
-                'matches ' + messageText + ' as ' + item.expected + ' and ' + operation.expected
-              );
+          const space = 1 === iterator ? ' ' : '',
+                messageText = item.supplied + space + operation.supplied + value.supplied,
+                testName = (
+                  'matches ' + messageText + ' as ' + item.expected + ' and ' +
+                  operation.expected + ' and ' + value.expected
+                );
 
-        it( testName, () => {
-          const result = helpers.extractPlusMinusEventData( messageText );
-          expect( result ).toEqual({
-            item: item.expected,
-            operation: operation.expected
+          it( testName, () => {
+            const result = helpers.extractPlusMinusEventData( messageText );
+            expect( result ).toEqual({
+              item: item.expected,
+              operation: operation.expected,
+              value: value.expected
+            });
           });
-        });
 
-      } // For iterator.
+        } // For iterator.
+      } // For valuesToMatch.
     } // For operationsToMatch.
+    /* eslint-enable max-depth */
 
     for ( const operation of operationsNotToMatch ) {
       const messageText = item.supplied + operation;

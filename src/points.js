@@ -60,9 +60,10 @@ const retrieveTopScores = async() => {
  * @param {string} item      The Slack user ID (if user) or name (if thing) of the item being
  *                           operated on.
  * @param {string} operation The mathematical operation performed on the item's score.
+ * @param {string} value     Value to add or substract
  * @return {int} The item's new score after the update has been applied.
  */
-const updateScore = async( item, operation ) => {
+const updateScore = async( item, operation, value ) => {
 
   // Connect to the DB, and create a table if it's not yet there.
   // We also set up the citext extension, so that we can easily be case insensitive.
@@ -75,8 +76,8 @@ const updateScore = async( item, operation ) => {
   // Atomically record the action.
   // TODO: Fix potential SQL injection issues here, even though we know the input should be safe.
   await dbClient.query( '\
-    INSERT INTO ' + scoresTableName + ' VALUES (\'' + item + '\', ' + operation + '1) \
-    ON CONFLICT (item) DO UPDATE SET score = ' + scoresTableName + '.score ' + operation + ' 1; \
+    INSERT INTO ' + scoresTableName + ' VALUES (\'' + item + '\', ' + operation + value + ') \
+    ON CONFLICT (item) DO UPDATE SET score = ' + scoresTableName + '.score ' + operation + ' ' + value + '; \
   ' );
 
   // Get the new value.
