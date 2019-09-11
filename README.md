@@ -22,6 +22,14 @@ Or:
 
 ```@CoffeeShop-- for forgetting my order ;(```
 
+Or:
+
+```@CoffeeShop ++123```
+
+Or:
+
+```@CoffeeShop --10```
+
 **Working PlusPlus++** will keep track of the score everyone (and everything) is sitting on.
 
 Completely open source, so do with it what you like. Or if you don't want to make your own tweaks, deploy it as-is right now with the instructions below. You need somewhere to host it: [Heroku](https://heroku.com) is highly recommended because it's free in most cases, and performs super well.
